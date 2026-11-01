@@ -25,7 +25,7 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 
-# Never include Chrome user data
+# Never include browser user data
 Local State
 Preferences
 Bookmarks

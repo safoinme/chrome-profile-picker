@@ -1,125 +1,89 @@
 <p align="center">
-  <img src="docs/banner.svg" alt="Chrome Profile Picker — Your links. The right profile." width="100%">
+  <img src="docs/banner.svg" alt="Profile Picker" width="100%">
 </p>
 
-<p align="center">
-  <strong>A quiet native macOS app for choosing where your web links open.</strong><br>
-  macOS 13+ · Google Chrome · Apple silicon &amp; Intel · Swift + AppKit · MIT
-</p>
+A native macOS menu bar app that sends incoming web links to the Chromium browser profile you choose. Pick a profile for each link, or set a default until you switch back.
 
----
+macOS 13+ · Apple silicon and Intel · Swift and AppKit · MIT
 
-Work account, personal account, side project. One browser, different contexts.
+## Browsers
 
-Chrome Profile Picker sits in your menu bar and sends incoming web links to the profile you choose. Keep a default while you focus, then switch back to choosing a profile for every link.
+Every installed browser in this table appears in one list. Its profiles are found in the folder shown, under `~/Library/Application Support/`.
 
-## Small app, useful defaults
-
-| | What it does |
+| Browser | Folder |
 | --- | --- |
-| **Choose each time** | Pick a Chrome profile when an incoming link arrives. |
-| **Stay in one profile** | Set a default until you switch back manually. |
-| **Start quietly** | Launch into the menu bar, without opening a window or popover. |
-| **Keep names current** | Pick up profile changes on the next menu opening or link, with a manual refresh available. |
-| **Keep links recoverable** | Retain a link after a failed Chrome launch so you can retry. |
-| **Stay local** | No accounts, analytics, network client or downloaded runtime dependencies. |
+| Google Chrome, Beta, Dev, Canary | `Google/Chrome`, `Google/Chrome Beta`, `Google/Chrome Dev`, `Google/Chrome Canary` |
+| Chromium | `Chromium` |
+| Brave, Beta, Nightly | `BraveSoftware/Brave-Browser`, `-Beta`, `-Nightly` |
+| Microsoft Edge, Beta, Dev, Canary | `Microsoft Edge`, `Microsoft Edge Beta`, `Microsoft Edge Dev`, `Microsoft Edge Canary` |
+| Vivaldi | `Vivaldi` |
+| Arc, Dia | `Arc/User Data`, `Dia/User Data` |
+| Comet, Helium | `Comet`, `net.imput.helium` |
+
+To add a browser, add a line to `Browser.known` in `Sources/ProfileStore.swift`. It needs Chromium's profile layout (`Default` and `Profile N` folders, names in `Local State`) and must honor `--profile-directory`.
+
+Google Chrome is the only browser launched for real so far. See [Current limits](#current-limits).
 
 ## Get started
 
-**Requirements:** macOS 13 or later and Google Chrome stable. Building requires Xcode Command Line Tools with Swift 6 and `swift-format`.
-
-This repository currently ships source. A signed, notarized download is not published yet. Build the app locally:
+Building requires Xcode Command Line Tools with Swift 6 and `swift-format`. There is no published download yet.
 
 ```sh
 ./check.sh
-open "build/Chrome Profile Picker.app"
+open "build/Profile Picker.app"
 ```
 
-The app starts in the menu bar. Click its profile icon, then:
+Copy the built app to **Applications** before enabling web links. Then click its menu bar icon:
 
-1. Open the gear menu and choose **Use for web links…**. Accept macOS’s confirmation to use the app for HTTP and HTTPS links.
-2. If profile discovery needs permission, choose **Allow Chrome profile access…** and select `~/Library/Application Support/Google/Chrome`.
+1. Open the gear menu, choose **Use for web links…**, and accept the macOS confirmation.
+2. If a browser appears under **Allow … profile access…**, click it and select the folder it opens.
 3. Choose a default profile, or keep **Ask every time**.
 
-For a permanent installation, copy the built app to **Applications** before enabling web links. To start it automatically, add the installed app under **System Settings → General → Login Items → Open at Login**. It will launch quietly.
+To start the app at login, add it under **System Settings → General → Login Items → Open at Login**.
 
-> **Distribution status**
-> Local builds use an ad hoc signature. They are not Developer ID signed or Apple notarized, and another Mac may block a downloaded copy. Public binary distribution needs signing and notarization. Do not disable Gatekeeper to install it.
+## Behavior
 
-## How it fits your day
+- Links come from apps that honor the macOS default browser. Links clicked inside a browser normally stay there, and some apps choose a browser themselves.
+- Only HTTP and HTTPS links are accepted.
+- Several links are handled in order. A failed launch keeps its link for retry. Closing the picker cancels its waiting links.
+- A default profile persists across restarts until you switch back. If it is unavailable, links go to the picker and the default is kept.
 
-**When you want a choice:** select **Ask every time** in the menu bar. Incoming links show the picker; choose a profile or cancel.
+## Privacy
 
-**When you want to stay focused:** choose a default profile. New links go there until you switch back. Your choice persists across restarts; there is no timer.
+The app reads each installed browser's `Local State` file for profile display names, and checks that profile folders and their `Preferences` files exist. It does not read the contents of `Preferences`, browsing history, cookies or saved passwords. It has no network client or analytics. The browser receives the URLs you open.
 
-The gear menu also lets you paste a link, refresh profiles, set up web-link handling and open browser settings.
-
-### What routes through the picker?
-
-- Links from apps that honor the macOS default browser.
-- HTTP and HTTPS links only.
-- Links clicked inside Chrome normally stay in Chrome. Some apps explicitly choose a browser and bypass the system default.
-
-When several links arrive, the app processes them in order. A failed launch keeps its link available for retry. Closing the picker cancels its waiting links.
-
-## Privacy, in plain language
-
-The app reads Chrome’s `Local State` file to extract profile display names. It checks profile folders and whether their `Preferences` files exist; it does not read those files’ contents.
-
-**What stays in memory:** profile names and links waiting to be opened. The metadata cache retains names only.
-
-**What macOS preferences store:** the selected profile folder identifier and, if you grant folder access, a security-scoped folder bookmark. Neither is bundled with the app or stored in this repository.
-
-**What it does not access:** browsing history, cookies or saved passwords. The app has no analytics or network client. Chrome receives the URLs you choose to open and handles browsing normally.
+macOS preferences hold the selected profile and any security-scoped folder bookmarks you grant.
 
 ## Build, check and package
 
-No package manager or dependency download is required.
-
 ```sh
 ./check.sh    # format, shell syntax, plist, behavior tests, universal build, signature
-./build.sh    # build/Chrome Profile Picker.app
-./package.sh  # dist/Chrome-Profile-Picker-<version>.dmg plus SHA-256 checksum
-```
-
-The universal build includes `arm64` and `x86_64` binaries targeting macOS 13+. Packaging creates a drag-to-Applications DMG with installation notes.
-
-Apply the formatter with:
-
-```sh
+./build.sh    # build/Profile Picker.app
+./package.sh  # dist/Profile-Picker-<version>.dmg plus SHA-256 checksum
 xcrun swift-format format --in-place Sources/*.swift Tests/*.swift
 ```
 
-<details>
-<summary><strong>A small codebase</strong></summary>
-
-| File | Responsibility |
-| --- | --- |
-| `Sources/main.swift` | Menu bar lifecycle, native UI, permissions and Chrome launch coordination. |
-| `Sources/PickerUI.swift` | Reusable AppKit controls, colors and cached artwork. |
-| `Sources/ProfileStore.swift` | Profile discovery, cached names and web-link parsing. |
-| `Sources/LinkRouting.swift` | Pending links and persistent default-profile selection. |
-| `Tests/main.swift` | Behavioral checks using temporary fixtures and an isolated preferences suite. |
-
-</details>
-
 ## Current limits
 
-- Runtime checks have been performed on Apple silicon with macOS 27.2. Intel and older macOS hardware remain untested.
-- Compiling both architectures does not establish runtime compatibility across every supported system.
-- The project is an early local candidate, without a notarized release or automatic updates.
-- Builds use the neutral bundle identifier `local.ChromeProfilePicker`. Earlier local prototypes used a different identifier; their preferences and default-browser registration do not migrate automatically. Set up a newly built copy before relying on it.
+- Runtime checks ran on Apple silicon with macOS 27.2. Intel and older macOS versions are untested.
+- Browsers other than Chrome are listed from commonly reported bundle identifiers and folders, and have not been launched by this app. A wrong entry shows no profiles. A browser that ignores `--profile-directory` opens the link in its last-used profile.
+- The **Allow … profile access…** step is confirmed for Google Chrome only.
+- Browsers missing from the table do not appear until a line is added.
+- Opera is left out because it does not appear to use the `Default` and `Profile N` layout.
+- Builds are ad hoc signed, not Developer ID signed or notarized, so another Mac may block a downloaded copy. Do not disable Gatekeeper to install it.
 
 ## Contributing
 
-Small, focused improvements are welcome. Describe the behavior you want to change and run `./check.sh` before submitting a pull request. Keep generated builds and personal Chrome data out of Git.
+Describe the behavior you want to change and run `./check.sh` before submitting a pull request. In reports, use synthetic examples. Do not attach `Local State`, profile folders, access bookmarks or private URLs.
 
-For reports, use synthetic examples. Do not attach Chrome’s `Local State`, profile folders, access bookmarks or URLs containing credentials or private information.
+## Upgrading from Chrome Profile Picker
+
+The bundle identifier is unchanged, so preferences and web-link handling carry over. Quit the old app and move it to the Trash before installing this one, so macOS does not keep two copies under one identifier.
 
 ## Uninstall
 
-Choose another default browser in macOS settings, remove the app’s Open at Login entry, quit it from the gear menu, then move it to the Trash. App preferences remain unless removed separately.
+Choose another default browser in macOS settings, remove the Open at Login entry, quit the app from the gear menu, then move it to the Trash. App preferences remain unless removed separately.
 
-## License and acknowledgments
+## License
 
-[MIT](LICENSE). Third-party artwork keeps its original notices in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt), which is also bundled with the app. This project is independent of Google and is not affiliated with or endorsed by Google Chrome.
+[MIT](LICENSE). Third-party artwork keeps its notices in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt), which is bundled with the app. This project is independent of and not endorsed by Google or any other browser vendor.
