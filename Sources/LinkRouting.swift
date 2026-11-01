@@ -33,16 +33,17 @@ struct ProfileSelection {
   let defaults: UserDefaults
 
   var directory: String? { defaults.string(forKey: "defaultProfileDirectory") }
-
-  func choose(_ profile: ChromeProfile?) {
-    if let profile {
-      defaults.set(profile.directory, forKey: "defaultProfileDirectory")
-    } else {
-      defaults.removeObject(forKey: "defaultProfileDirectory")
-    }
+  // Selections saved before multi-browser support have no browser key and mean Chrome.
+  private var browserID: String {
+    defaults.string(forKey: "defaultProfileBrowser") ?? Browser.chromeID
   }
 
-  func profile(in profiles: [ChromeProfile]) -> ChromeProfile? {
-    profiles.first { $0.directory == directory }
+  func choose(_ profile: BrowserProfile?) {
+    defaults.set(profile?.directory, forKey: "defaultProfileDirectory")
+    defaults.set(profile?.browser.id, forKey: "defaultProfileBrowser")
+  }
+
+  func profile(in profiles: [BrowserProfile]) -> BrowserProfile? {
+    profiles.first { $0.directory == directory && $0.browser.id == browserID }
   }
 }

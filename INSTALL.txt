@@ -1,6 +1,6 @@
-Chrome Profile Picker 0.3.0
+Profile Picker 0.3.0
 
-1. Drag Chrome Profile Picker to Applications.
+1. Drag Profile Picker to Applications.
 2. Launch it. It starts quietly in the menu bar.
 3. Click the menu bar profile icon, then the gear menu.
 4. Choose "Use for web links..." and accept the macOS confirmation.
@@ -9,15 +9,17 @@ Chrome Profile Picker 0.3.0
 For automatic startup, add the app to System Settings > General >
 Login Items > Open at Login. It stays quiet when launched at login.
 
-Requires macOS 13+ and Google Chrome (stable).
+Requires macOS 13+ and a Chromium browser. Chrome has been launched
+for real. Chromium, Brave, Edge, Vivaldi, Arc, Dia, Comet and Helium
+are listed but untested.
 Contains Apple silicon and Intel binaries.
 
 This local candidate is ad hoc signed, not Developer ID signed or
 Apple notarized. Another Mac may block a downloaded copy. Public
 sharing needs signing and notarization; do not disable Gatekeeper.
 
-If profiles cannot be read, use "Allow Chrome profile access..."
-and select ~/Library/Application Support/Google/Chrome.
+If macOS blocks a browser's profiles, the app shows an "Allow <browser>
+profile access..." button. Use it and select the folder it opens.
 
 Only profile names and folder availability are used. No history,
 cookies or passwords are read. Artwork notices are inside the app.
