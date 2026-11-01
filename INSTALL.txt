@@ -1,0 +1,26 @@
+Chrome Profile Picker 0.3.0
+
+1. Drag Chrome Profile Picker to Applications.
+2. Launch it. It starts quietly in the menu bar.
+3. Click the menu bar profile icon, then the gear menu.
+4. Choose "Use for web links..." and accept the macOS confirmation.
+5. Choose a default profile, or keep "Ask every time".
+
+For automatic startup, add the app to System Settings > General >
+Login Items > Open at Login. It stays quiet when launched at login.
+
+Requires macOS 13+ and Google Chrome (stable).
+Contains Apple silicon and Intel binaries.
+
+This local candidate is ad hoc signed, not Developer ID signed or
+Apple notarized. Another Mac may block a downloaded copy. Public
+sharing needs signing and notarization; do not disable Gatekeeper.
+
+If profiles cannot be read, use "Allow Chrome profile access..."
+and select ~/Library/Application Support/Google/Chrome.
+
+Only profile names and folder availability are used. No history,
+cookies or passwords are read. Artwork notices are inside the app.
+
+To uninstall, switch to another default browser, remove the Open at
+Login entry, quit Profile Picker, then move it to the Trash.

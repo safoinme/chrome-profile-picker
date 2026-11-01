@@ -1,0 +1,34 @@
+# Generated builds and local previews
+/build/
+/dist/
+*.app/
+*.dmg
+*.zip
+*.dSYM/
+.DS_Store
+/index.html
+/preview.png
+
+# Credentials, signing material, and local configuration
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.mobileprovision
+*.log
+
+# IDE state
+.swiftpm/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+
+# Never include Chrome user data
+Local State
+Preferences
+Bookmarks
+History
+Cookies
+Login Data
